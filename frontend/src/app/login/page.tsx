@@ -6,12 +6,24 @@ import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Credentials, login} from "@/lib/auth";
+import useAppAuth from "@/hooks/useAppAuth";
+import {signIn, useSession} from "next-auth/react";
+import {redirect} from "next/navigation";
+
+
 
 type Props = {
     children?: React.ReactNode
 }
 
 const Page = (props: Props) => {
+    const {} = useSession({
+        required: false,
+        onUnauthenticated() {
+            redirect('/')
+        },
+
+    });
     const {register, handleSubmit} = useForm<Credentials>({
         defaultValues: {
             password: '2559069dev',
@@ -20,13 +32,12 @@ const Page = (props: Props) => {
     });
 
     const onSubmit = handleSubmit(async (data) => {
-        await login(data);
+       await signIn('login', data);
     });
 
 
     return <div className="container flex items-center justify-center h-screen">
         <div className="grid w-full max-w-sm items-center gap-1.5 mx-auto">
-
             <form onSubmit={onSubmit}>
                 <Label htmlFor="email">Email</Label>
                 <Input  {...register('email')} id="email" type="email" placeholder="Email"/>

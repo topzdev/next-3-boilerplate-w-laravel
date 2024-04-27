@@ -5,6 +5,8 @@ import {useForm} from "react-hook-form";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import {useSession} from "next-auth/react";
+import {redirect} from "next/navigation";
 
 type Props = {
     children?: React.ReactNode
@@ -20,6 +22,10 @@ export type RegisterInfo = {
 }
 
 const Page = (props: Props) => {
+    const {} = useSession({
+        required: false,
+    });
+
     const {register, handleSubmit} = useForm<RegisterInfo>();
 
     const onSubmit = handleSubmit((data) => {
@@ -28,7 +34,7 @@ const Page = (props: Props) => {
 
     return <div className="container flex items-center justify-center h-screen">
         <div className="grid w-full max-w-sm items-center gap-1.5 mx-auto">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={onSubmit}>
                 <Label htmlFor="firstname">Firstname</Label>
                 <Input {...register('firstname')} id="firstname" type="text" placeholder="Firstname"/>
 

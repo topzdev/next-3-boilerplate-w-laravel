@@ -1,17 +1,16 @@
 "use client";
-import {Button} from "@/components/ui/button";
-import {getClientSession, getSession} from "@/lib/auth";
-import {logout} from '@/lib/auth';
 
-export default function Home() {
-    const session = getClientSession();
+import {useSession} from "next-auth/react";
+
+const Home = () => {
+    const {data: session} = useSession();
+
     return (
         <main className="flex min-h-screen flex-col items-center p-24">
             Homepage
-
-            {JSON.stringify(session)}
-
-            <Button onClick={logout}>Logout</Button>
+            <pre>{JSON.stringify(session, null, 2)}</pre>
         </main>
     );
 }
+
+export default Home;
