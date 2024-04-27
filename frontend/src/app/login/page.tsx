@@ -17,14 +17,7 @@ type Props = {
 }
 
 const Page = (props: Props) => {
-    const {} = useSession({
-        required: false,
-        onUnauthenticated() {
-            redirect('/')
-        },
-
-    });
-    const {register, handleSubmit} = useForm<Credentials>({
+    const {register, handleSubmit, formState} = useForm<Credentials>({
         defaultValues: {
             password: '2559069dev',
             email: 'christianlugod05@gmail.com'
@@ -43,7 +36,7 @@ const Page = (props: Props) => {
                 <Input  {...register('email')} id="email" type="email" placeholder="Email"/>
                 <Label htmlFor="email">Password</Label>
                 <Input   {...register('password')} id="email" type="password" placeholder="Password"/>
-                <Button type={'submit'}>Login</Button>
+                <Button loading={formState.isSubmitting} disabled={formState.isSubmitting} type={'submit'}>Login</Button>
             </form>
             <hr/>
         </div>

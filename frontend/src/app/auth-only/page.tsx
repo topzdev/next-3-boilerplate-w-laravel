@@ -10,12 +10,7 @@ type Props = {
     children?: React.ReactNode
 }
 export default function Page() {
-    const {session} = useAppAuth({
-        required: true,
-        onUnauthenticated() {
-            redirect('/login')
-        },
-    });
+    const {session} = useAppAuth();
 
     return <>
         <main className="flex min-h-screen flex-col items-center p-24">

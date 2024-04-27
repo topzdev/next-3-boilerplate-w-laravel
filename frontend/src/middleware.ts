@@ -2,7 +2,7 @@ import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
-const protectedRoutes = ['/', '/auth-only'];
+const protectedRoutes = ['/auth-only'];
 const authRoutes = ['/login', '/register', '/guest-only'];
 const publicRoutes = ['/', '/about']
 const loginRoute = '/login';
@@ -15,13 +15,8 @@ export default withAuth(
         const isAuthenticated = !!token;
         const isAuthRoute = authRoutes.includes(pathname);
         const isProtectedRoute = protectedRoutes.includes(pathname);
+        const isPublicRoute = publicRoutes.includes(pathname);
 
-        console.log({
-            pathname,
-            isAuthenticated,
-            isAuthRoute,
-            isProtectedRoute
-        })
 
         if (isProtectedRoute && !isAuthenticated) {
             return  NextResponse.redirect(new URL(loginRoute, req.nextUrl));
@@ -30,8 +25,8 @@ export default withAuth(
         if (isAuthRoute && isAuthenticated) {
             return NextResponse.redirect(new URL(homeRoute, req.nextUrl));
         }
-        //
-        // return req;
+
+        return NextResponse.next();
     },
     {
         callbacks: {

@@ -22,10 +22,6 @@ export type RegisterInfo = {
 }
 
 const Page = (props: Props) => {
-    const {} = useSession({
-        required: false,
-    });
-
     const {register, handleSubmit} = useForm<RegisterInfo>();
 
     const onSubmit = handleSubmit((data) => {
@@ -51,7 +47,7 @@ const Page = (props: Props) => {
                 <Label htmlFor="confirm_password">Confirm Password</Label>
                 <Input {...register('confirm_password')} id="confirm_password" type="password" placeholder="Email"/>
 
-                <Button type={'submit'}>Register</Button>
+                <Button className={'mt-2'} type={'submit'}>Register</Button>
             </form>
 
         </div>

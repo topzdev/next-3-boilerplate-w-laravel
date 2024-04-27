@@ -12,9 +12,6 @@ type Props = {
 const Page = (props: Props) => {
     const {session} = useAppAuth({
         required: false,
-        onUnauthenticated() {
-            redirect('/login')
-        },
     });
 
     return <>

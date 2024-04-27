@@ -44,6 +44,7 @@ export const authOptions: NextAuthOptions = {
       signIn: '/login',
     },
     providers: [
+
         CredentialsProvider({
             name: 'Login',
             id: 'login',

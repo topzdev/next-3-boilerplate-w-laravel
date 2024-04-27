@@ -9,13 +9,6 @@ type Props = {
 }
 
 const Page = (props: Props) => {
-    const {} = useSession({
-        required: true,
-        onUnauthenticated() {
-            redirect('/')
-        },
-
-    });
 
     return <>
         <h1>
