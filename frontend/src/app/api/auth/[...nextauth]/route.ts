@@ -1,6 +1,8 @@
 import NextAuth, {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import ky from "@/lib/ky";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
+
 
 /*Next Auth Guide
 * https://medium.com/ascentic-technology/authentication-with-next-js-13-and-next-auth-9c69d55d6bfd
@@ -39,17 +41,126 @@ type LoginResponse = {
     access_token: string
 }
 
+type AccessTokenAuth = {
+    access_token: string
+}
+
 export const authOptions: NextAuthOptions = {
     pages: {
-      signIn: '/login',
+        signIn: '/login',
     },
     providers: [
+        FacebookProvider({
+            clientId: process.env.FACEBOOK_CLIENT_ID || '',
+            clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
+            // @ts-ignore
+            async profile(profile, tokens) {
+                console.log('Google Login', {profile, tokens});
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        access_token: tokens.access_token,
+                        provider: 'facebook'
+                    }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                })
 
+                const data = await response.json();
+
+                console.log('Facebook Login Data',{data});
+
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(data))
+                }
+
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                    access_token: data.access_token,
+
+                }
+            },
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || '',
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+            // @ts-ignore
+            async profile(profile, tokens) {
+                console.log('Google Login', {profile, tokens});
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/oauth`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        access_token: tokens.access_token,
+                        provider: 'google'
+                    }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                })
+
+                const data = await response.json();
+
+                console.log('Google Login Data',{data});
+
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(data))
+                }
+
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                    access_token: data.access_token
+                }
+            },
+        }),
+
+        CredentialsProvider({
+            id: 'access_token',
+            // @ts-ignore
+            async authorize(credential: AccessTokenAuth) {
+                console.log('Access Token Auth', credential);
+                return {access_token: credential.access_token}
+            }
+        }),
+
+        CredentialsProvider({
+            id: 'register',
+            // @ts-ignore
+            async authorize(credential: AccessTokenAuth) {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/register`, {
+                    method: 'POST',
+                    body: JSON.stringify(credential),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                })
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(data))
+                }
+
+                console.log('Register', {credential, data});
+
+                return {access_token: data.access_token}
+            }
+        }),
         CredentialsProvider({
             name: 'Login',
             id: 'login',
-            async authorize(credentials, req) {
-                console.log('Login Credential',credentials);
+            // @ts-ignore
+            async authorize(credentials: Credentials, req) {
+                console.log('Login Credential', credentials);
 
                 const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/login`, {
                     method: 'POST',
@@ -60,11 +171,11 @@ export const authOptions: NextAuthOptions = {
                     }
                 })
 
-                if (!response.ok) {
-                    throw response.body
-                }
+                const data = await response.json();
 
-                const data = (await response.json()) as LoginResponse;
+                if (!response.ok) {
+                    throw new Error(JSON.stringify(data))
+                }
 
                 return {access_token: data.access_token};
             }
@@ -72,7 +183,7 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async signIn({user, account, profile, email, credentials}) {
-            // console.log('Sign IN', {user,  account, profile, email, credentials})
+            console.log('Sign IN', {user,  account, profile, email, credentials})
 
             return true
         },
@@ -84,7 +195,8 @@ export const authOptions: NextAuthOptions = {
             if (!!user) {
                 token.user = user.user
                 token.access_token = user.access_token
-            };
+            }
+            ;
             return token
         },
         async session({session, token}) {
@@ -92,7 +204,7 @@ export const authOptions: NextAuthOptions = {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization':  token.access_token ? `Bearer ${token.access_token}` : ''
+                    'Authorization': token.access_token ? `Bearer ${token.access_token}` : ''
                 }
             });
 

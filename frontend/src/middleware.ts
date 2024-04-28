@@ -5,8 +5,8 @@ import { NextResponse } from 'next/server';
 const protectedRoutes = ['/auth-only'];
 const authRoutes = ['/login', '/register', '/guest-only'];
 const publicRoutes = ['/', '/about']
-const loginRoute = '/login';
-const homeRoute = '/';
+export const loginRoute = '/login';
+export const homeRoute = '/';
 export default withAuth(
     // `withAuth` augments your `Request` with the user's token.
     function middleware(req) {

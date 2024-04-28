@@ -7,6 +7,8 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/app/api/auth/[...nextauth]/route";
 import ClientSessionProvider from "@/components/providers/ClientSessionProvider";
 import Header from "@/components/common/Header";
+import {Toaster} from "@/components/ui/toaster"
+
 
 const fontSans = FontSans({
     subsets: ["latin"],
@@ -30,10 +32,10 @@ export default async function RootLayout({children}: Readonly<{
                 fontSans.variable
             )}
         >
-        <ClientSessionProvider >
+        <ClientSessionProvider session={session}>
             <Header/>
-
             {children}
+            <Toaster/>
         </ClientSessionProvider>
 
         </body>
