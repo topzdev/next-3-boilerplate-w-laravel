@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
                     method: 'POST',
                     body: JSON.stringify({
                         access_token: tokens.access_token,
-                        provider: 'facebook'
+                        provider: ''
                     }),
                     headers: {
                         'Accept': 'application/json',
