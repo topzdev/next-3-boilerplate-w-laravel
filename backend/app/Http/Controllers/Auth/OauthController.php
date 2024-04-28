@@ -22,31 +22,32 @@ class OauthController extends Controller
         $provider = $request->provider;
 
         $user = [];
+        $search = null;
 
         if($provider === 'google') {
             $googleUser = Socialite::driver('google')->userFromToken($access_token);
 
             $user = [
+
                 'firstname' => $googleUser->user["given_name"],
                 'lastname' => $googleUser->user["family_name"],
                 'email' => $googleUser->user["email"],
                 'google_id' => $googleUser->id
             ];
+
+            $search = User::where('email', $user['email'])->first();
         }
 
         if($provider === 'facebook') {
             $facebookUser = Socialite::driver('facebook')->userFromToken($access_token);
 
-            dd($facebookUser);
             $user = [
-                'firstname' => $facebookUser->user["given_name"],
-                'lastname' => $facebookUser->user["family_name"],
-                'email' => $facebookUser->user["email"],
-                'google_id' => $facebookUser->id
+                'facebook_id' => $facebookUser->id
             ];
+
+            $search = User::where('facebook_id', $user['facebook_id'])->first();
         }
 
-        $search = User::where('email', $user['email'])->first();
 
         if(!isset($search)) {
             $user = User::create($user);

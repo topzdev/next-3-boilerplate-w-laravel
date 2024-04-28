@@ -24,6 +24,7 @@ class User extends Authenticatable
         'facebook_id',
         'email',
         'password',
+        'user_type',
     ];
 
     /**
@@ -47,5 +48,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function hasPassword() {
+        return !!$this->password;
     }
 }
